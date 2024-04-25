@@ -51,6 +51,7 @@ colors = [(255, 0, 255), (0, 255, 255), (255, 255, 9)]
 
 
 if args.image != None:
+    file_dir = "result.png"
     results = model.predict(
         source=args.image,
         imgsz=256,
@@ -58,11 +59,12 @@ if args.image != None:
     )
 
     render = render_result(model=model, image=args.image, result=results[0])
-    file_dir = "result.png"
     render.save(fp=file_dir)
     frame = cv2.imread(file_dir)
+
     cv2.imshow("Overseer.io - Camera Feed", frame)
     cv2.waitKey(0)
+
     if args.save == False:
         os.remove(file_dir)
 
