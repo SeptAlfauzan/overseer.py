@@ -1,10 +1,15 @@
+import os
 import cv2
 import socket
 from datetime import datetime
 from ultralytics import YOLO
+import numpy as np
 from ultralytics.utils.plotting import Annotator
-
+from ultralyticsplus import render_result
+import requests
+from io import BytesIO
 import argparse
+
 
 available_models = ["yolov8n", "yolov8n-ghostnet-p5", "yolov8n-ghostnet-p6"]
 
@@ -21,10 +26,12 @@ parser.add_argument(
     choices=available_models,
     default=available_models[0],
 )  # option that takes a value
-parser.add_argument("-i", "--index_camera", type=int, default=0)  # on/off flag
+parser.add_argument("-c", "--camera", type=int, default=0)  # on/off flag
+parser.add_argument("-i", "--image", type=str, default=None)  # on/off flag
+parser.add_argument("-s", "--save", type=bool, default=False)  # on/off flag
 
 args = parser.parse_args()
-print(args.model_name, args.index_camera)
+print(args.model_name, args.camera, args.save)
 
 models_paths = [
     "./student-behavior/models/yolov8n.pt",
@@ -32,7 +39,7 @@ models_paths = [
     "./student-behavior/models/yolov8n_ghostnet_p6.pt",
 ]
 
-cap = cv2.VideoCapture(args.index_camera)
+cap = cv2.VideoCapture(args.camera)
 HOST = "127.0.0.1"  # Server's hostname or IP address
 PORT = 12345  # Server's port
 
@@ -40,37 +47,58 @@ model = YOLO(
     models_paths[available_models.index(args.model_name)]
 )  # load a pretrained model (recommended for training)
 
-while True:
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-    results = model.predict(source=frame, imgsz=256)
-    for r in results:
-        annotator = Annotator(frame)
+colors = [(255, 0, 255), (0, 255, 255), (255, 255, 9)]
 
-        boxes = r.boxes
-        for box in boxes:
-            b = box.xyxy[
-                0
-            ]  # dapatkan koordinat kotak dalam format (top, left, bottom, right)
-            c = box.cls
 
-            score = box.conf.item() * 100
-            class_id = int(box.cls.item())
+if args.image != None:
+    results = model.predict(
+        source=args.image,
+        imgsz=256,
+        project="result_images",
+    )
 
-            label = "{}: {}".format(model.names[int(c)], format(box.conf[0], ".2f"))
-            annotator.box_label(
-                b,
-                label,
-                color=(255, 0, 255),
-            )
+    render = render_result(model=model, image=args.image, result=results[0])
+    file_dir = "result.png"
+    render.save(fp=file_dir)
+    frame = cv2.imread(file_dir)
+    cv2.imshow("Overseer.io - Camera Feed", frame)
+    cv2.waitKey(0)
+    if args.save == False:
+        os.remove(file_dir)
 
-        frame = annotator.result()
-    # Display the resulting frame
-    cv2.imshow("Camera Feed", frame)
+else:
+    while True:
+        # Capture frame-by-frame
+        ret, framae = cap.read()
+        results = model.predict(source=frame, imgsz=256)
+        for r in results:
+            annotator = Annotator(frame)
 
-    # Check for 'q' key to exit the loop
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+            boxes = r.boxes
+            for box in boxes:
+                b = box.xyxy[
+                    0
+                ]  # dapatkan koordinat kotak dalam format (top, left, bottom, right)
+                c = box.cls
+
+                score = box.conf.item() * 100
+                class_id = int(box.cls.item())
+
+                label = "{}: {}".format(model.names[int(c)], format(box.conf[0], ".2f"))
+                annotator.box_label(
+                    b,
+                    label,
+                    txt_color=(0, 0, 0),
+                    color=colors[int(c)],
+                )
+
+            frame = annotator.result()
+        # Display the resulting frame
+        cv2.imshow("Overseer.io - Camera Feed", frame)
+
+        # Check for 'q' key to exit the loop
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
 
 
 try:
