@@ -6,7 +6,6 @@ from ultralytics import YOLO
 import numpy as np
 from ultralytics.utils.plotting import Annotator
 from ultralyticsplus import render_result
-import requests
 from io import BytesIO
 import argparse
 
@@ -71,7 +70,7 @@ if args.image != None:
 else:
     while True:
         # Capture frame-by-frame
-        ret, framae = cap.read()
+        ret, frame = cap.read()
         results = model.predict(source=frame, imgsz=256)
         for r in results:
             annotator = Annotator(frame)
