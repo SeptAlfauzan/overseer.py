@@ -3,9 +3,11 @@
 This program is part of my undergraduate thesis. Using data that I've been collected from Roboflow site, taking photo from classroom, and scrapping through internet. This program will be used four kind YOLOv8 model weight:
 
 1. YOLOv8n
-2. YOLOv8n - Ghostnet - P5
-3. YOLOv8n - Ghostnet - P6
+2. YOLOv8n _with_ Ghostnet - P5
+3. YOLOv8n _with_ Ghostnet - P6
 4. YOLOv8s
+
+## How to build?
 
 To build this python program into standalone program, please **follow these instructions**
 
