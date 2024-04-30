@@ -1,0 +1,6 @@
+[submodule "scb-deploy"]
+	path = scb-deploy
+	url = https://huggingface.co/spaces/septa/student-behavior
+[submodule "student-behavior"]
+	path = student-behavior
+	url = https://huggingface.co/spaces/septa/student-behavior
