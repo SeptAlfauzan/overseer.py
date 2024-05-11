@@ -33,9 +33,9 @@ args = parser.parse_args()
 print(args.model_name, args.camera, args.save)
 
 models_paths = [
-    os.path.abspath("./student-behavior/models/yolov8n.pt"),
-    os.path.abspath("./student-behavior/models/yolov8n_ghostnet_p5.pt"),
-    os.path.abspath("./student-behavior/models/yolov8n_ghostnet_p6.pt"),
+    os.path.abspath("./student-behavior/models/batch-32/yolov8n.pt"),
+    os.path.abspath("./student-behavior/models/batch-32/yolov8n-ghostnet-p5.pt"),
+    os.path.abspath("./student-behavior/models/batch-32/yolov8n-ghostnet-p6.pt"),
 ]
 
 cap = cv2.VideoCapture(args.camera)
